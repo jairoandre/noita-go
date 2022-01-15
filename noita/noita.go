@@ -34,7 +34,7 @@ func NewScene() *Scene {
 	img := ebiten.NewImage(1, 1)
 	img.Fill(color.White)
 	gradient := colorgrad.Inferno()
-	grid := NewGrid()
+	grid := NewGrid(width, height)
 	for y := 0; y < hScaled; y++ {
 		row := make([]*Cell, 0)
 		for x := 0; x < wScaled; x++ {

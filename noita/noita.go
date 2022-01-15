@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	scale      = 2
+	scale      = 5
 	width      = 640
 	height     = 480
 	bufferSize = 64
@@ -28,11 +28,12 @@ type Scene struct {
 	IsPainting   bool
 	ImgBuffer    [][]*image.Image
 	PaintType    CellType
+	PreviousImg  *image.Image
 }
 
 func NewScene() *Scene {
 	img := ebiten.NewImage(1, 1)
-	img.Fill(color.RGBA{0x00, 0x00, 0x00, 0x00})
+	img.Fill(color.RGBA{})
 	gradient := colorgrad.Inferno()
 	grid := NewGrid(width, height)
 	for y := 0; y < hScaled; y++ {
@@ -96,6 +97,7 @@ func (s *Scene) Update() error {
 	if s.IsPainting {
 		s.Painting(s.PaintType)
 	} else {
+		// drop a grain of sand every 10 ticks
 		if s.Grid.Tick%10 == 0 {
 			s.Grid.Cells[0][wScaled/2].Type = sand
 		}
@@ -120,7 +122,9 @@ func (s *Scene) BrushLabel() string {
 }
 
 func (s *Scene) Draw(screen *ebiten.Image) {
-	screen.Fill(color.Transparent)
+	//if s.PreviousImg != nil {
+	//	screen.DrawImage(ebiten.NewImageFromImage(*s.PreviousImg), &ebiten.DrawImageOptions{})
+	//}
 	s.Grid.Draw(screen)
 	//imgBuffer := make([][]*image.Image, 0)
 	//for j := 0; j < height/bufferSize; j++ {
@@ -135,6 +139,8 @@ func (s *Scene) Draw(screen *ebiten.Image) {
 	//imgBuffer = append(imgBuffer, row)
 	//}
 	//s.ImgBuffer = imgBuffer
+	//prevImg := screen.SubImage(screen.Bounds())
+	//s.PreviousImg = &prevImg
 	utils.DebugInfo(screen)
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\nPress [A] to change brush: %s", s.BrushLabel()))
 }

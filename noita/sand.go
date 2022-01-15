@@ -16,7 +16,6 @@ func (g *Grid) UpdateSandCell(x, y int, prevCell *Cell) bool {
 	cell.Alpha = rand.Float64() + 0.2
 	if wasWater {
 		prevCell.Type = water
-		prevCell.Tick = g.Tick - 1
 		g.UpdateWater(int(prevCell.Pos.X), int(prevCell.Pos.Y))
 	}
 	return true
@@ -27,15 +26,17 @@ func (g *Grid) UpdateSand(x, y int) {
 	if curr == nil {
 		return
 	}
-	curr.Tick = g.Tick
 	curr.Type = empty
 	if g.UpdateSandCell(x, y+1, curr) {
+		curr.Tick = g.Tick
 		return
 	}
 	if g.UpdateSandCell(x-1, y+1, curr) {
+		curr.Tick = g.Tick
 		return
 	}
 	if g.UpdateSandCell(x+1, y+1, curr) {
+		curr.Tick = g.Tick
 		return
 	}
 	curr.Type = sand

@@ -21,22 +21,25 @@ func (g *Grid) UpdateWater(x, y int) {
 	if g.Tick == curr.Tick {
 		return
 	}
-	curr.Tick = g.Tick
-	curr.Type = empty
 	curr.Type = empty
 	if g.UpdateWaterCell(x, y+1) {
+		curr.Tick = g.Tick
 		return
 	}
 	if g.UpdateWaterCell(x-1, y+1) {
+		curr.Tick = g.Tick
 		return
 	}
 	if g.UpdateWaterCell(x+1, y+1) {
+		curr.Tick = g.Tick
 		return
 	}
 	if g.UpdateWaterCell(x-1, y) {
+		curr.Tick = g.Tick
 		return
 	}
 	if g.UpdateWaterCell(x+1, y) {
+		curr.Tick = g.Tick
 		return
 	}
 	curr.Type = water

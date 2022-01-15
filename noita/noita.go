@@ -32,7 +32,7 @@ type Scene struct {
 
 func NewScene() *Scene {
 	img := ebiten.NewImage(1, 1)
-	img.Fill(color.White)
+	img.Fill(color.RGBA{0x00, 0x00, 0x00, 0x00})
 	gradient := colorgrad.Inferno()
 	grid := NewGrid(width, height)
 	for y := 0; y < hScaled; y++ {
@@ -122,19 +122,19 @@ func (s *Scene) BrushLabel() string {
 func (s *Scene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.Transparent)
 	s.Grid.Draw(screen)
-	imgBuffer := make([][]*image.Image, 0)
-	for j := 0; j < height/bufferSize; j++ {
-		row := make([]*image.Image, 0)
-		for i := 0; i < width/bufferSize; i++ {
-			x0 := i * bufferSize
-			y0 := i * bufferSize
-			bounds := image.Rect(x0, y0, x0+bufferSize, y0+bufferSize)
-			img := screen.SubImage(bounds)
-			row = append(row, &img)
-		}
-		imgBuffer = append(imgBuffer, row)
-	}
-	s.ImgBuffer = imgBuffer
+	//imgBuffer := make([][]*image.Image, 0)
+	//for j := 0; j < height/bufferSize; j++ {
+	//row := make([]*image.Image, 0)
+	//for i := 0; i < width/bufferSize; i++ {
+	//	x0 := i * bufferSize
+	//	y0 := i * bufferSize
+	//	bounds := image.Rect(x0, y0, x0+bufferSize, y0+bufferSize)
+	//	img := screen.SubImage(bounds)
+	//	row = append(row, &img)
+	//}
+	//imgBuffer = append(imgBuffer, row)
+	//}
+	//s.ImgBuffer = imgBuffer
 	utils.DebugInfo(screen)
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\nPress [A] to change brush: %s", s.BrushLabel()))
 }

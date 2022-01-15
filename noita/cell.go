@@ -44,7 +44,12 @@ func (p *Cell) Draw(screen *ebiten.Image) {
 	var clr = CellTypeColors[p.Type]
 	op := &ebiten.DrawImageOptions{}
 	r, g, b, a := utils.NormalizeColor(clr)
-	op.ColorM.Scale(r, g, b, a*p.Alpha)
+	if p.Alpha < 0.3 {
+		a *= 0.3
+	} else if p.Alpha < 0.7 {
+		a *= 0.7
+	}
+	op.ColorM.Translate(r, g, b, a)
 	op.GeoM.Scale(scale, scale)
 	op.GeoM.Translate(p.Pos.X*scale, p.Pos.Y*scale)
 	screen.DrawImage(p.Img, op)

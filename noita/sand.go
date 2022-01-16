@@ -11,8 +11,10 @@ func (g *Grid) UpdateSandCell(x, y int, prevCell *Cell) bool {
 		return false
 	}
 	wasWater := cell.Type == water
-	cell.Type = sand
+	// cell.Tick equals to g.Tick means that the particle
+	// was updated.
 	cell.Tick = g.Tick
+	cell.Type = sand
 	cell.Alpha = rand.Float64() + 0.2
 	if wasWater {
 		prevCell.Type = water
@@ -23,7 +25,7 @@ func (g *Grid) UpdateSandCell(x, y int, prevCell *Cell) bool {
 
 func (g *Grid) UpdateSand(x, y int) {
 	curr := g.Get(x, y)
-	if curr == nil {
+	if curr == nil || g.Tick == curr.Tick {
 		return
 	}
 	curr.Type = empty

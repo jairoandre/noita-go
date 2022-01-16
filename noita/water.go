@@ -15,10 +15,7 @@ func (g *Grid) UpdateWaterCell(x, y int) bool {
 
 func (g *Grid) UpdateWater(x, y int) {
 	curr := g.Get(x, y)
-	if curr == nil {
-		return
-	}
-	if g.Tick == curr.Tick {
+	if curr == nil || g.Tick == curr.Tick {
 		return
 	}
 	curr.Type = empty

@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	scale      = 5
-	width      = 640
-	height     = 480
+	scale      = 4
+	width      = 1024
+	height     = 768
 	bufferSize = 64
 	wScaled    = width / scale
 	hScaled    = height / scale
@@ -120,27 +120,24 @@ func (s *Scene) BrushLabel() string {
 		return "-"
 	}
 }
+func (s *Scene) FillImgBuffer(screen *ebiten.Image) {
+	imgBuffer := make([][]*image.Image, 0)
+	for j := 0; j < height/bufferSize; j++ {
+		row := make([]*image.Image, 0)
+		for i := 0; i < width/bufferSize; i++ {
+			x0 := i * bufferSize
+			y0 := i * bufferSize
+			bounds := image.Rect(x0, y0, x0+bufferSize, y0+bufferSize)
+			img := screen.SubImage(bounds)
+			row = append(row, &img)
+		}
+		imgBuffer = append(imgBuffer, row)
+	}
+	s.ImgBuffer = imgBuffer
+}
 
 func (s *Scene) Draw(screen *ebiten.Image) {
-	//if s.PreviousImg != nil {
-	//	screen.DrawImage(ebiten.NewImageFromImage(*s.PreviousImg), &ebiten.DrawImageOptions{})
-	//}
 	s.Grid.Draw(screen)
-	//imgBuffer := make([][]*image.Image, 0)
-	//for j := 0; j < height/bufferSize; j++ {
-	//row := make([]*image.Image, 0)
-	//for i := 0; i < width/bufferSize; i++ {
-	//	x0 := i * bufferSize
-	//	y0 := i * bufferSize
-	//	bounds := image.Rect(x0, y0, x0+bufferSize, y0+bufferSize)
-	//	img := screen.SubImage(bounds)
-	//	row = append(row, &img)
-	//}
-	//imgBuffer = append(imgBuffer, row)
-	//}
-	//s.ImgBuffer = imgBuffer
-	//prevImg := screen.SubImage(screen.Bounds())
-	//s.PreviousImg = &prevImg
 	utils.DebugInfo(screen)
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\nPress [A] to change brush: %s", s.BrushLabel()))
 }

@@ -8,16 +8,14 @@ import (
 )
 
 type Grid struct {
-	Cells     [][]*Cell
-	BaseImage *ebiten.Image
-	Tick      int
+	Cells [][]*Cell
+	Tick  int
 }
 
 func NewGrid(w, h int) *Grid {
 	return &Grid{
-		Cells:     make([][]*Cell, 0),
-		BaseImage: ebiten.NewImage(w, h),
-		Tick:      0,
+		Cells: make([][]*Cell, 0),
+		Tick:  0,
 	}
 }
 
@@ -105,16 +103,14 @@ func (g *Grid) DrawGoRoutine(screen *ebiten.Image) {
 
 func (g *Grid) Draw(screen *ebiten.Image) {
 	total := 0
-	g.BaseImage.Clear()
 	for _, row := range g.Cells {
 		for _, cell := range row {
 			if cell.Type == empty {
 				continue
 			}
 			total++
-			cell.Draw(g.BaseImage)
+			cell.Draw(screen)
 		}
 	}
-	screen.DrawImage(g.BaseImage, &ebiten.DrawImageOptions{})
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\nTotal particles: %d", total))
 }

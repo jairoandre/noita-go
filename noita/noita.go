@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	scale   = 4
-	width   = 1024
-	height  = 768
+	scale   = 2
+	width   = 640
+	height  = 480
 	wScaled = width / scale
 	hScaled = height / scale
 )
@@ -77,13 +77,15 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 
 }
 
+const paintSize = 3
+
 func (s *Scene) Painting(cType CellType) {
 	mx, my := ebiten.CursorPosition()
 	rx := mx / scale
 	ry := my / scale
 	if rx > 0 && rx < wScaled && ry > 0 && ry < hScaled {
-		for j := -1; j <= 1; j++ {
-			for i := -1; i <= 1; i++ {
+		for j := -paintSize; j <= paintSize; j++ {
+			for i := -paintSize; i <= paintSize; i++ {
 				cell := s.Grid.Get(rx+i, ry+j)
 				if cell == nil {
 					continue
@@ -147,6 +149,7 @@ func (s *Scene) BrushLabel() string {
 
 func (s *Scene) Draw(screen *ebiten.Image) {
 	s.Grid.Draw(screen, s.Canvas)
+	//s.Canvas = image.NewRGBA(image.Rect(0, 0, width, height))
 	utils.DebugInfo(screen)
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\nPress [A] to change brush: %s", s.BrushLabel()))
 }

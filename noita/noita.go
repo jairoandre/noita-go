@@ -7,7 +7,8 @@ import (
 	"github.com/mazznoer/colorgrad"
 	"image"
 	"image/color"
-	"math/rand"
+	"noita-go/model"
+	"noita-go/model/solid"
 	"noita-go/utils"
 )
 
@@ -20,37 +21,41 @@ const (
 	hScaled    = height / scale
 )
 
+type CellType uint8
+
 type Scene struct {
 	Title        string
 	Img          *ebiten.Image
-	Grid         *Grid
+	Grid         *model.Grid
 	FireGradient colorgrad.Gradient
 	IsPainting   bool
 	ImgBuffer    [][]*image.Image
 	PaintType    CellType
 	PreviousImg  *image.Image
+	Paused       bool
 }
 
 func NewScene() *Scene {
 	img := ebiten.NewImage(1, 1)
 	img.Fill(color.RGBA{})
 	gradient := colorgrad.Inferno()
-	grid := NewGrid(width, height)
+	grid := model.NewGrid()
 	for y := 0; y < hScaled; y++ {
-		row := make([]*Cell, 0)
+		row := make([]*model.Cell, 0)
 		for x := 0; x < wScaled; x++ {
 			xf64 := float64(x)
 			yf64 := float64(y)
-			row = append(row, NewCell(xf64, yf64, img, empty))
+			row = append(row, model.NewCell(xf64, yf64, scale, img, grid))
 		}
 		grid.Cells = append(grid.Cells, row)
 	}
+	grid.FillCellNeighbor()
 	return &Scene{
 		Title:        "Noita Go",
 		Img:          img,
 		FireGradient: gradient,
 		Grid:         grid,
-		PaintType:    sand,
+		PaintType:    1,
 	}
 }
 
@@ -58,20 +63,35 @@ func (s *Scene) GetDimensions() (int, int) {
 	return width, height
 }
 
+func (s *Scene) PaintElement(cType CellType) model.Element {
+	switch cType {
+	case 0:
+		return model.NewEmpty()
+	case 1:
+		return solid.NewSand()
+	case 2:
+		return solid.NewSand()
+	case 3:
+		return solid.NewGround()
+	default:
+		return solid.NewSand()
+	}
+
+}
+
 func (s *Scene) Painting(cType CellType) {
 	mx, my := ebiten.CursorPosition()
 	rx := mx / scale
 	ry := my / scale
 	if rx > 0 && rx < wScaled && ry > 0 && ry < hScaled {
-		for j := -2; j <= 2; j++ {
-			for i := -2; i <= 2; i++ {
+		for j := -1; j <= 1; j++ {
+			for i := -1; i <= 1; i++ {
 				cell := s.Grid.Get(rx+i, ry+j)
 				if cell == nil {
 					continue
 				}
 				cell.Tick = s.Grid.Tick
-				cell.Type = cType
-				cell.Alpha = rand.Float64() + 0.3
+				cell.Element = s.PaintElement(cType)
 			}
 		}
 	}
@@ -81,9 +101,12 @@ func (s *Scene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		for _, row := range s.Grid.Cells {
 			for _, cell := range row {
-				cell.Type = empty
+				cell.Element = model.NewEmpty()
 			}
 		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+		s.Paused = !s.Paused
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
 		s.PaintType = (s.PaintType + 1) % 4
@@ -99,41 +122,28 @@ func (s *Scene) Update() error {
 	} else {
 		// drop a grain of sand every 10 ticks
 		if s.Grid.Tick%10 == 0 {
-			s.Grid.Cells[0][wScaled/2].Type = sand
+			s.Grid.Cells[0][wScaled/2].Element = solid.NewSand()
 		}
 	}
-	s.Grid.Update()
+	if !s.Paused {
+		s.Grid.Update()
+	}
 	return nil
 }
 
 func (s *Scene) BrushLabel() string {
 	switch s.PaintType {
-	case empty:
+	case 0:
 		return "Eraser"
-	case sand:
+	case 1:
 		return "Sand"
-	case water:
+	case 2:
 		return "Water"
-	case ground:
+	case 3:
 		return "Ground"
 	default:
 		return "-"
 	}
-}
-func (s *Scene) FillImgBuffer(screen *ebiten.Image) {
-	imgBuffer := make([][]*image.Image, 0)
-	for j := 0; j < height/bufferSize; j++ {
-		row := make([]*image.Image, 0)
-		for i := 0; i < width/bufferSize; i++ {
-			x0 := i * bufferSize
-			y0 := i * bufferSize
-			bounds := image.Rect(x0, y0, x0+bufferSize, y0+bufferSize)
-			img := screen.SubImage(bounds)
-			row = append(row, &img)
-		}
-		imgBuffer = append(imgBuffer, row)
-	}
-	s.ImgBuffer = imgBuffer
 }
 
 func (s *Scene) Draw(screen *ebiten.Image) {

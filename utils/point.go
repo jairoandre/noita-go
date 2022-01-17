@@ -3,16 +3,20 @@ package utils
 import "math"
 
 type Point struct {
-	X float64
-	Y float64
+	X    float64
+	Y    float64
+	XInt int
+	YInt int
 }
 
 type Vector2D Point
 
 func Vec2(x, y float64) Vector2D {
 	return Vector2D{
-		X: x,
-		Y: y,
+		X:    x,
+		Y:    y,
+		XInt: int(x),
+		YInt: int(y),
 	}
 }
 
@@ -21,6 +25,10 @@ func Pt(X, Y float64) Point {
 		X: X,
 		Y: Y,
 	}
+}
+
+func (p Point) IntCoords() (int, int) {
+	return p.XInt, p.YInt
 }
 
 func (p Point) Add(other Point) Point {

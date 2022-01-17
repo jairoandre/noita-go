@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	scale   = 2
+	scale   = 4
 	width   = 640
 	height  = 480
 	wScaled = width / scale
@@ -77,7 +77,7 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 
 }
 
-const paintSize = 5
+const paintSize = 1
 
 func (s *Scene) Painting(cType CellType) {
 	mx, my := ebiten.CursorPosition()

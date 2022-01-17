@@ -34,7 +34,8 @@ func (g *Grid) Get(x, y int) *Cell {
 
 func (g *Grid) Update() {
 	g.Tick += 1
-	for y := 0; y < len(g.Cells); y++ {
+	startY := len(g.Cells) - 1
+	for y := startY; y >= 0; y-- {
 		row := g.Cells[y]
 		for x := 0; x < len(row); x++ {
 			row[x].Update()
@@ -46,7 +47,8 @@ func (g *Grid) Draw(screen *ebiten.Image, canvas *image.RGBA) {
 	total := 0
 	start := time.Now()
 	wg := sync.WaitGroup{}
-	for y := 0; y < len(g.Cells); y++ {
+	startY := len(g.Cells) - 1
+	for y := startY; y >= 0; y-- {
 		row := g.Cells[y]
 		wg.Add(1)
 		go func() {

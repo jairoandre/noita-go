@@ -77,7 +77,7 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 
 }
 
-const paintSize = 3
+const paintSize = 5
 
 func (s *Scene) Painting(cType CellType) {
 	mx, my := ebiten.CursorPosition()

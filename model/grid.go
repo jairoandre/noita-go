@@ -42,24 +42,27 @@ func (g *Grid) Update() {
 	}
 }
 
-func (g *Grid) DrawRow(canvas *image.RGBA, row []*Cell, wg *sync.WaitGroup, total chan int) {
-
-}
-
 func (g *Grid) Draw(screen *ebiten.Image, canvas *image.RGBA) {
 	total := 0
 	start := time.Now()
+	wg := sync.WaitGroup{}
 	for y := 0; y < len(g.Cells); y++ {
 		row := g.Cells[y]
-		for x := 0; x < len(row); x++ {
-			cell := row[x]
-			if cell.Element.SkipDraw() {
-				continue
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for x := 0; x < len(row); x++ {
+				cell := row[x]
+				if cell.Element.SkipDraw() {
+					continue
+				}
+				cell.DrawOnImage(canvas)
+				total++
 			}
-			cell.DrawOnImage(canvas)
-			total++
-		}
+		}()
 	}
+	wg.Wait()
+	//screen.DrawImage(ebiten.NewImageFromImage(canvas), &ebiten.DrawImageOptions{})
 	screen.ReplacePixels(canvas.Pix)
 	end := time.Now()
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\nTotal particles: %d", total))

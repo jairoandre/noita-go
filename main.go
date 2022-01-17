@@ -8,8 +8,8 @@ import (
 
 func main() {
 	scene := noita.NewScene()
-	w, h := scene.GetDimensions()
-	ebiten.SetWindowSize(w, h)
+	//w, h := scene.GetDimensions()
+	ebiten.SetWindowSize(1024, 768)
 	ebiten.SetWindowTitle(scene.Title)
 	if err := ebiten.RunGame(scene); err != nil {
 		log.Fatal(err)

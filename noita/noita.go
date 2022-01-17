@@ -8,6 +8,7 @@ import (
 	"image"
 	"image/color"
 	"noita-go/model"
+	"noita-go/model/liquid"
 	"noita-go/model/solid"
 	"noita-go/utils"
 )
@@ -70,7 +71,7 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 	case 1:
 		return solid.NewSand()
 	case 2:
-		return solid.NewSand()
+		return liquid.NewWater()
 	case 3:
 		return solid.NewGround()
 	default:

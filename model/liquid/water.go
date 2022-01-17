@@ -8,7 +8,7 @@ type Water struct {
 
 func NewWater() Water {
 	water := Water{}
-	water.DispersionRate = 2
+	water.DispersionRate = 4
 	return water
 }
 

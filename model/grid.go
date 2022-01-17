@@ -3,7 +3,9 @@ package model
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"image"
 	"noita-go/utils"
+	"sync"
 	"time"
 )
 
@@ -40,20 +42,34 @@ func (g *Grid) Update() {
 	}
 }
 
-func (g *Grid) Draw(screen *ebiten.Image) {
+func (g *Grid) DrawRow(canvas *image.RGBA, row []*Cell, wg *sync.WaitGroup, total chan int) {
+	defer wg.Done()
+	for x := 0; x < len(row); x++ {
+		cell := row[x]
+		if cell.Element.SkipDraw() {
+			continue
+		}
+		//cell.Draw(screen)
+		cell.DrawOnImage(canvas)
+		curr := <-total
+		total <- curr + 1
+	}
+
+}
+
+func (g *Grid) Draw(screen *ebiten.Image, canvas *image.RGBA) {
+	totalChan := make(chan int)
 	total := 0
 	start := time.Now()
+	wg := sync.WaitGroup{}
 	for y := 0; y < len(g.Cells); y++ {
+		wg.Add(1)
 		row := g.Cells[y]
-		for x := 0; x < len(row); x++ {
-			cell := row[x]
-			if cell.Element.SkipDraw() {
-				continue
-			}
-			cell.Draw(screen)
-			total++
-		}
+		go g.DrawRow(canvas, row, &wg, totalChan)
 	}
+	wg.Wait()
+	total = <-totalChan
+	screen.ReplacePixels(canvas.Pix)
 	end := time.Now()
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\nTotal particles: %d", total))
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\n\nTime to Draw: %dms", end.Sub(start).Milliseconds()))
@@ -72,5 +88,4 @@ func (g *Grid) FillCellNeighbor() {
 			cell.RightDown = g.Get(x+1, y+1)
 		}
 	}
-
 }

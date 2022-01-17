@@ -1,7 +1,8 @@
 package model
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
+	"image"
+	"image/draw"
 	"noita-go/utils"
 )
 
@@ -11,8 +12,9 @@ type Cell struct {
 	Scale     float64
 	xScaled   float64
 	yScaled   float64
+	iXScaled  int
+	iYScaled  int
 	Element   Element
-	Img       *ebiten.Image
 	Grid      *Grid
 	Down      *Cell
 	Up        *Cell
@@ -22,17 +24,28 @@ type Cell struct {
 	LeftDown  *Cell
 	RightUp   *Cell
 	RightDown *Cell
+	Glowing   bool
+	Rect      image.Rectangle
 }
 
-func NewCell(x, y, scale float64, img *ebiten.Image, grid *Grid) *Cell {
+func NewCell(x, y, scale float64, grid *Grid) *Cell {
+	xScaled := x * scale
+	yScaled := y * scale
+	iXScaled := int(xScaled)
+	iYScaled := int(yScaled)
+	iScale := int(scale)
+	rect := image.Rect(iXScaled, iYScaled, iXScaled+iScale, iYScaled+iScale)
 	return &Cell{
-		Pos:     utils.Pt(x, y),
-		Scale:   scale,
-		xScaled: x * scale,
-		yScaled: y * scale,
-		Grid:    grid,
-		Img:     img,
-		Element: NewEmpty(),
+		Pos:      utils.Pt(x, y),
+		Scale:    scale,
+		xScaled:  x * scale,
+		yScaled:  y * scale,
+		Grid:     grid,
+		Glowing:  true,
+		Element:  NewEmpty(),
+		iXScaled: iXScaled,
+		iYScaled: iYScaled,
+		Rect:     rect,
 	}
 }
 
@@ -48,14 +61,9 @@ func (p *Cell) AlreadyUpdated() bool {
 	return p.Tick == p.Grid.Tick
 }
 
-func (p *Cell) Draw(screen *ebiten.Image) {
-	var clr = p.Element.Color()
-	op := &ebiten.DrawImageOptions{}
-	r, g, b, a := utils.NormalizeColor(clr)
-	op.ColorM.Translate(r, g, b, a)
-	op.GeoM.Scale(p.Scale, p.Scale)
-	op.GeoM.Translate(p.xScaled, p.yScaled)
-	screen.DrawImage(p.Img, op)
+func (p *Cell) DrawOnImage(canvas *image.RGBA) {
+	uniform := image.NewUniform(p.Element.Color())
+	draw.Draw(canvas, p.Rect, uniform, image.Pt(p.iXScaled, p.iYScaled), draw.Over)
 }
 
 func (p *Cell) SwapElements(o *Cell) {

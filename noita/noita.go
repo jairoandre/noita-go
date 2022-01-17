@@ -6,7 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/mazznoer/colorgrad"
 	"image"
-	"image/color"
 	"noita-go/model"
 	"noita-go/model/liquid"
 	"noita-go/model/solid"
@@ -14,19 +13,17 @@ import (
 )
 
 const (
-	scale      = 4
-	width      = 1024
-	height     = 768
-	bufferSize = 64
-	wScaled    = width / scale
-	hScaled    = height / scale
+	scale   = 4
+	width   = 1024
+	height  = 768
+	wScaled = width / scale
+	hScaled = height / scale
 )
 
 type CellType uint8
 
 type Scene struct {
 	Title        string
-	Img          *ebiten.Image
 	Grid         *model.Grid
 	FireGradient colorgrad.Gradient
 	IsPainting   bool
@@ -34,29 +31,29 @@ type Scene struct {
 	PaintType    CellType
 	PreviousImg  *image.Image
 	Paused       bool
+	Canvas       *image.RGBA
 }
 
 func NewScene() *Scene {
-	img := ebiten.NewImage(1, 1)
-	img.Fill(color.RGBA{})
 	gradient := colorgrad.Inferno()
 	grid := model.NewGrid()
+	canvas := image.NewRGBA(image.Rect(0, 0, width, height))
 	for y := 0; y < hScaled; y++ {
 		row := make([]*model.Cell, 0)
 		for x := 0; x < wScaled; x++ {
 			xf64 := float64(x)
 			yf64 := float64(y)
-			row = append(row, model.NewCell(xf64, yf64, scale, img, grid))
+			row = append(row, model.NewCell(xf64, yf64, scale, grid))
 		}
 		grid.Cells = append(grid.Cells, row)
 	}
 	grid.FillCellNeighbor()
 	return &Scene{
 		Title:        "Noita Go",
-		Img:          img,
 		FireGradient: gradient,
 		Grid:         grid,
 		PaintType:    1,
+		Canvas:       canvas,
 	}
 }
 
@@ -99,6 +96,7 @@ func (s *Scene) Painting(cType CellType) {
 }
 
 func (s *Scene) Update() error {
+	s.Canvas = image.NewRGBA(image.Rect(0, 0, width, height))
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		for _, row := range s.Grid.Cells {
 			for _, cell := range row {
@@ -122,9 +120,9 @@ func (s *Scene) Update() error {
 		s.Painting(s.PaintType)
 	} else {
 		// drop a grain of sand every 10 ticks
-		if s.Grid.Tick%10 == 0 {
-			s.Grid.Cells[0][wScaled/2].Element = solid.NewSand()
-		}
+		//if s.Grid.Tick%10 == 0 {
+		//	s.Grid.Cells[0][wScaled/2].Element = solid.NewSand()
+		//}
 	}
 	if !s.Paused {
 		s.Grid.Update()
@@ -148,7 +146,7 @@ func (s *Scene) BrushLabel() string {
 }
 
 func (s *Scene) Draw(screen *ebiten.Image) {
-	s.Grid.Draw(screen)
+	s.Grid.Draw(screen, s.Canvas)
 	utils.DebugInfo(screen)
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\nPress [A] to change brush: %s", s.BrushLabel()))
 }

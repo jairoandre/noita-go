@@ -204,7 +204,7 @@ func (s *Scene) BrushLabel() string {
 
 func (s *Scene) Draw(screen *ebiten.Image) {
 	s.Grid.Draw(screen, s.Canvas)
-	//s.Canvas = image.NewRGBA(image.Rect(0, 0, width, height))
+	s.Canvas = image.NewRGBA(image.Rect(0, 0, width, height))
 	utils.DebugInfo(screen)
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\nPress [A] to change brush: %s", s.BrushLabel()))
 }

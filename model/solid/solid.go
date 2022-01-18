@@ -1,6 +1,7 @@
 package solid
 
 import (
+	"image/color"
 	"math/rand"
 	"noita-go/model"
 )
@@ -16,6 +17,10 @@ func (s Solid) Type() model.ElementType {
 
 func (s Solid) SkipDraw() bool {
 	return false
+}
+
+func (s Solid) Alpha() color.Alpha {
+	return color.Alpha{A: 255}
 }
 
 func (s Solid) Update(cell *model.Cell) {

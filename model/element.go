@@ -15,6 +15,7 @@ const (
 
 type Element interface {
 	Color() color.Color
+	Alpha() color.Alpha
 	Update(cell *Cell)
 	SkipDraw() bool
 	Type() ElementType
@@ -30,6 +31,10 @@ func NewEmpty() Empty {
 
 func (e Empty) Color() color.Color {
 	return color.Transparent
+}
+
+func (e Empty) Alpha() color.Alpha {
+	return color.Alpha{}
 }
 
 func (e Empty) Update(_ *Cell) {

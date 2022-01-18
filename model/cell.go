@@ -63,7 +63,8 @@ func (p *Cell) AlreadyUpdated() bool {
 
 func (p *Cell) DrawOnImage(canvas *image.RGBA) {
 	uniform := image.NewUniform(p.Element.Color())
-	draw.Draw(canvas, p.Rect, uniform, image.Pt(p.iXScaled, p.iYScaled), draw.Src)
+	alpha := image.NewUniform(p.Element.Alpha())
+	draw.DrawMask(canvas, p.Rect, uniform, image.Pt(p.iXScaled, p.iYScaled), alpha, alpha.Bounds().Min, draw.Src)
 }
 
 func (p *Cell) SwapElements(o *Cell) {

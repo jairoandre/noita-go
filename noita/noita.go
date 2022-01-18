@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/mazznoer/colorgrad"
 	"image"
+	"math"
 	"noita-go/model"
 	"noita-go/model/liquid"
 	"noita-go/model/solid"
@@ -13,7 +14,7 @@ import (
 )
 
 const (
-	scale   = 2
+	scale   = 12
 	width   = 640
 	height  = 480
 	wScaled = width / scale
@@ -81,22 +82,57 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 
 const paintSize = 1
 
-func (s *Scene) Painting(cType CellType) {
-	mx, my := ebiten.CursorPosition()
-	rx := mx / scale
-	ry := my / scale
-	if rx > 0 && rx < wScaled && ry > 0 && ry < hScaled {
-		for j := -paintSize; j <= paintSize; j++ {
-			for i := -paintSize; i <= paintSize; i++ {
-				cell := s.Grid.Get(rx+i, ry+j)
-				if cell == nil {
-					continue
-				}
-				cell.Tick = s.Grid.Tick
-				cell.Element = s.PaintElement(cType)
+func (s *Scene) PaintAt(x, y int, cType CellType) {
+	rx := x / scale
+	ry := y / scale
+	if rx < 0 || rx > wScaled || ry < 0 || ry > hScaled {
+		return
+	}
+	for j := -paintSize; j <= paintSize; j++ {
+		for i := -paintSize; i <= paintSize; i++ {
+			cell := s.Grid.Get(rx+i, ry+j)
+			if cell == nil {
+				continue
 			}
+			cell.Tick = s.Grid.Tick
+			cell.Element = s.PaintElement(cType)
 		}
 	}
+}
+
+func (s *Scene) PaintSloped(mx, my int, cType CellType) {
+	dx := mx - s.prevX
+	dy := my - s.prevY
+	slope := 0.0
+	if dx != 0 {
+		slope = float64(dy) / float64(dx)
+	}
+	if slope == 0.0 {
+		stepY := 1
+		if s.prevY > my {
+			stepY = -1
+		}
+		for sY := s.prevY; (stepY > 0 && sY <= my) || (stepY < 0 && sY >= my); sY += stepY {
+			s.PaintAt(mx, sY, cType)
+		}
+		return
+	}
+	step := 1
+	if s.prevX > mx {
+		step = -1
+	}
+	for sX := s.prevX; (step > 0 && sX <= mx) || (step < 0 && sX >= mx); sX += step {
+		sY := int(math.Round(float64(sX)*slope)) + s.prevY
+		s.PaintAt(sX, sY, cType)
+	}
+	s.prevX = mx
+	s.prevY = my
+
+}
+
+func (s *Scene) Painting(cType CellType) {
+	mx, my := ebiten.CursorPosition()
+	s.PaintAt(mx, my, cType)
 }
 
 func (s *Scene) Update() error {

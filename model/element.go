@@ -19,6 +19,7 @@ type Element interface {
 	Update(cell *Cell)
 	SkipDraw() bool
 	Type() ElementType
+	Weight() int
 }
 
 type Empty struct {

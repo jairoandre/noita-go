@@ -8,6 +8,7 @@ import (
 	"image"
 	"math"
 	"noita-go/model"
+	"noita-go/model/gas"
 	"noita-go/model/liquid"
 	"noita-go/model/solid"
 	"noita-go/utils"
@@ -74,6 +75,8 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 		return liquid.NewWater()
 	case 3:
 		return solid.NewGround()
+	case 4:
+		return gas.NewSteam()
 	default:
 		return solid.NewSand()
 	}
@@ -164,7 +167,7 @@ func (s *Scene) Update() error {
 		s.Paused = !s.Paused
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		s.PaintType = (s.PaintType + 1) % 4
+		s.PaintType = (s.PaintType + 1) % 5
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		s.prevX, s.prevY = ebiten.CursorPosition()

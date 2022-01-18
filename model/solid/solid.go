@@ -11,6 +11,10 @@ type Solid struct {
 	Falling        bool
 }
 
+func (s Solid) Weight() int {
+	
+}
+
 func (s Solid) Type() model.ElementType {
 	return model.SolidType
 }

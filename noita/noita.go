@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	scale   = 12
+	scale   = 2
 	width   = 640
 	height  = 480
 	wScaled = width / scale
@@ -101,30 +101,45 @@ func (s *Scene) PaintAt(x, y int, cType CellType) {
 }
 
 func (s *Scene) PaintSloped(mx, my int, cType CellType) {
-	dx := mx - s.prevX
-	dy := my - s.prevY
-	slope := 0.0
-	if dx != 0 {
-		slope = float64(dy) / float64(dx)
-	}
-	if slope == 0.0 {
-		stepY := 1
-		if s.prevY > my {
-			stepY = -1
-		}
-		for sY := s.prevY; (stepY > 0 && sY <= my) || (stepY < 0 && sY >= my); sY += stepY {
-			s.PaintAt(mx, sY, cType)
-		}
+	if mx < 0 || mx > width || my < 0 || my > height {
 		return
 	}
-	step := 1
-	if s.prevX > mx {
-		step = -1
+	dx := float64(mx - s.prevX)
+	dy := float64(my - s.prevY)
+	absDx := math.Abs(dx)
+	absDy := math.Abs(dy)
+	if dx == 0 || dy == 0 {
+		return
 	}
-	for sX := s.prevX; (step > 0 && sX <= mx) || (step < 0 && sX >= mx); sX += step {
-		sY := int(math.Round(float64(sX)*slope)) + s.prevY
-		s.PaintAt(sX, sY, cType)
+	xDiffIsLarger := absDx > absDy
+	stepX := 1.0
+	if dx < 0 {
+		stepX = -1.0
 	}
+	stepY := 1.0
+	if dy < 0 {
+		stepY = -1.0
+	}
+	longerSideLength := math.Max(absDx, absDy)
+	shorterSideLength := math.Min(absDx, absDy)
+	slope := shorterSideLength / longerSideLength
+
+	for i := 1.0; i <= longerSideLength; i++ {
+		shorterSideIncrease := math.Round(i * slope)
+		xIncrease := 0.0
+		yIncrease := 0.0
+		if xDiffIsLarger {
+			xIncrease = i
+			yIncrease = shorterSideIncrease
+		} else {
+			xIncrease = shorterSideIncrease
+			yIncrease = i
+		}
+		toX := s.prevX + int(math.Round(xIncrease*stepX))
+		toY := s.prevY + int(math.Round(yIncrease*stepY))
+		s.PaintAt(toX, toY, cType)
+	}
+
 	s.prevX = mx
 	s.prevY = my
 
@@ -133,6 +148,7 @@ func (s *Scene) PaintSloped(mx, my int, cType CellType) {
 func (s *Scene) Painting(cType CellType) {
 	mx, my := ebiten.CursorPosition()
 	s.PaintAt(mx, my, cType)
+	s.PaintSloped(mx, my, cType)
 }
 
 func (s *Scene) Update() error {

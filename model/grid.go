@@ -6,7 +6,7 @@ import (
 	"image"
 	"noita-go/utils"
 	"sync"
-	"time"
+	"sync/atomic"
 )
 
 type Grid struct {
@@ -44,8 +44,7 @@ func (g *Grid) Update() {
 }
 
 func (g *Grid) Draw(screen *ebiten.Image, canvas *image.RGBA) {
-	total := 0
-	start := time.Now()
+	var total uint64
 	wg := sync.WaitGroup{}
 	startY := len(g.Cells) - 1
 	for y := startY; y >= 0; y-- {
@@ -59,16 +58,13 @@ func (g *Grid) Draw(screen *ebiten.Image, canvas *image.RGBA) {
 					continue
 				}
 				cell.DrawOnImage(canvas)
-				total++
+				atomic.AddUint64(&total, 1)
 			}
 		}()
 	}
 	wg.Wait()
-	//screen.DrawImage(ebiten.NewImageFromImage(canvas), &ebiten.DrawImageOptions{})
 	screen.ReplacePixels(canvas.Pix)
-	end := time.Now()
 	utils.DebugInfoMessage(screen, fmt.Sprintf("\nTotal particles: %d", total))
-	utils.DebugInfoMessage(screen, fmt.Sprintf("\n\n\nTime to Draw: %dms", end.Sub(start).Milliseconds()))
 }
 
 func (g *Grid) FillCellNeighbor() {

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	scale   = 4
+	scale   = 2
 	width   = 640
 	height  = 480
 	wScaled = width / scale
@@ -32,6 +32,8 @@ type Scene struct {
 	PreviousImg  *image.Image
 	Paused       bool
 	Canvas       *image.RGBA
+	prevX        int
+	prevY        int
 }
 
 func NewScene() *Scene {
@@ -113,6 +115,7 @@ func (s *Scene) Update() error {
 		s.PaintType = (s.PaintType + 1) % 4
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		s.prevX, s.prevY = ebiten.CursorPosition()
 		s.IsPainting = true
 	}
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {

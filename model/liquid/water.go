@@ -12,7 +12,7 @@ type Water struct {
 
 func NewWater() Water {
 	water := Water{}
-	water.DispersionRate = 4
+	water.DispersionRate = 3
 	water.Blue = uint8(255 * (rand.Float64()*0.2 + 0.8))
 	return water
 }

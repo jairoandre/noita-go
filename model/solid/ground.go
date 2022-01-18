@@ -14,7 +14,7 @@ type Ground struct {
 func NewGround() Ground {
 	ground := Ground{}
 	ground.Falling = false
-	ground.Red = uint8(255 * (rand.Float64()*0.1 + 0.6))
+	ground.Red = uint8(255 * (rand.Float64()*0.4 + 0.6))
 	return ground
 }
 

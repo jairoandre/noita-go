@@ -10,33 +10,37 @@ type Gas struct {
 	LifeSpan       int
 }
 
-func (l *Gas) Type() model.ElementType {
+func (g *Gas) Weight() int {
+	return -1
+}
+
+func (g *Gas) Type() model.ElementType {
 	return model.LiquidType
 }
 
-func (l *Gas) SkipDraw() bool {
+func (g *Gas) SkipDraw() bool {
 	return false
 }
 
-func (l *Gas) Update(cell *model.Cell) {
-	if l.LifeSpan <= 0 {
+func (g *Gas) Update(cell *model.Cell) {
+	if g.LifeSpan <= 0 {
 		cell.Element = model.NewEmpty()
 		return
 	}
 	if cell.AlreadyUpdated() {
 		return
 	}
-	l.LifeSpan -= 1
-	if l.LookUp(cell) {
+	g.LifeSpan -= 1
+	if g.LookUp(cell) {
 		return
 	}
-	if l.LookDiagonally(cell) {
+	if g.LookDiagonally(cell) {
 		return
 	}
-	l.LookSideways(cell)
+	g.LookSideways(cell)
 }
 
-func (l *Gas) LookUp(cell *model.Cell) bool {
+func (g *Gas) LookUp(cell *model.Cell) bool {
 	if cell.Up == nil {
 		return false
 	}
@@ -47,7 +51,7 @@ func (l *Gas) LookUp(cell *model.Cell) bool {
 	return true
 }
 
-func (l *Gas) LookDiagonally(cell *model.Cell) bool {
+func (g *Gas) LookDiagonally(cell *model.Cell) bool {
 	toLeft := true
 	curr := cell.LeftUp
 	if rand.Float64() > 0.5 {
@@ -65,7 +69,7 @@ func (l *Gas) LookDiagonally(cell *model.Cell) bool {
 	if curr == nil {
 		return false
 	}
-	for i := 1; i < l.DispersionRate; i++ {
+	for i := 1; i < g.DispersionRate; i++ {
 		nextCell := curr.LeftUp
 		if !toLeft {
 			nextCell = curr.RightUp
@@ -85,7 +89,7 @@ func (l *Gas) LookDiagonally(cell *model.Cell) bool {
 	return true
 }
 
-func (l *Gas) LookSideways(cell *model.Cell) bool {
+func (g *Gas) LookSideways(cell *model.Cell) bool {
 	toLeft := true
 	curr := cell.Left
 	if rand.Float64() > 0.5 {
@@ -103,7 +107,7 @@ func (l *Gas) LookSideways(cell *model.Cell) bool {
 	if curr == nil {
 		return false
 	}
-	for i := 1; i < l.DispersionRate; i++ {
+	for i := 1; i < g.DispersionRate; i++ {
 		nextCell := curr.Left
 		if !toLeft {
 			nextCell = curr.Right

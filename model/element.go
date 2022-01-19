@@ -30,6 +30,10 @@ func NewEmpty() Empty {
 	return Empty{}
 }
 
+func (e Empty) Weight() int {
+	return 0
+}
+
 func (e Empty) Color() color.Color {
 	return color.Transparent
 }

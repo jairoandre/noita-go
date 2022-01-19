@@ -9,6 +9,10 @@ type Liquid struct {
 	DispersionRate int
 }
 
+func (l Liquid) Weight() int {
+	return 1
+}
+
 func (l Liquid) Type() model.ElementType {
 	return model.LiquidType
 }

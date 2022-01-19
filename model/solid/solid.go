@@ -11,23 +11,23 @@ type Solid struct {
 	Falling        bool
 }
 
-func (s Solid) Weight() int {
-	
+func (s *Solid) Weight() int {
+	return 3
 }
 
-func (s Solid) Type() model.ElementType {
+func (s *Solid) Type() model.ElementType {
 	return model.SolidType
 }
 
-func (s Solid) SkipDraw() bool {
+func (s *Solid) SkipDraw() bool {
 	return false
 }
 
-func (s Solid) Alpha() color.Alpha {
+func (s *Solid) Alpha() color.Alpha {
 	return color.Alpha{A: 255}
 }
 
-func (s Solid) Update(cell *model.Cell) {
+func (s *Solid) Update(cell *model.Cell) {
 	// When cell ticks is equals to grid tick that means the cell is already updated
 	if cell.Tick == cell.Grid.Tick {
 		return
@@ -39,7 +39,7 @@ func (s Solid) Update(cell *model.Cell) {
 	// nothing
 }
 
-func (s Solid) lookDown(cell *model.Cell) bool {
+func (s *Solid) lookDown(cell *model.Cell) bool {
 	return TrySwap(cell, cell.Down)
 }
 
@@ -54,7 +54,7 @@ func TrySwap(cell, other *model.Cell) bool {
 	return true
 }
 
-func (s Solid) lookDiagonally(cell *model.Cell) bool {
+func (s *Solid) lookDiagonally(cell *model.Cell) bool {
 	rng := rand.Float64()
 	first := cell.LeftDown
 	second := cell.RightDown

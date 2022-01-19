@@ -11,17 +11,17 @@ type Ground struct {
 	Solid
 }
 
-func NewGround() Ground {
+func NewGround() *Ground {
 	ground := Ground{}
 	ground.Falling = false
 	ground.Red = uint8(255 * (rand.Float64()*0.4 + 0.6))
-	return ground
+	return &ground
 }
 
-func (g Ground) Update(cell *model.Cell) {
+func (g *Ground) Update(cell *model.Cell) {
 	// do nothing
 }
 
-func (g Ground) Color() color.Color {
+func (g *Ground) Color() color.Color {
 	return color.RGBA{R: g.Red, G: 0x76, B: 0x53, A: 0xff}
 }

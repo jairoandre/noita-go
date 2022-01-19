@@ -49,16 +49,22 @@ func (g *Grid) Draw(screen *ebiten.Image, canvas *image.RGBA) {
 	startY := len(g.Cells) - 1
 	for y := startY; y >= 0; y-- {
 		row := g.Cells[y]
+		rowU := g.Cells[startY-y]
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for x := 0; x < len(row); x++ {
+			startX := len(row) - 1
+			for x := 0; x <= startX; x++ {
 				cell := row[x]
-				if cell.Element.SkipDraw() {
-					continue
+				cellU := rowU[startX-x]
+				if !cell.Element.SkipDraw() && cell.Element.Weight() > 0 {
+					cell.DrawOnImage(canvas)
+					atomic.AddUint64(&total, 1)
 				}
-				cell.DrawOnImage(canvas)
-				atomic.AddUint64(&total, 1)
+				if !cellU.Element.SkipDraw() && cellU.Element.Weight() < 0 {
+					cellU.DrawOnImage(canvas)
+					atomic.AddUint64(&total, 1)
+				}
 			}
 		}()
 	}

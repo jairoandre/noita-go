@@ -6,7 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/mazznoer/colorgrad"
 	"image"
-	"math"
 	"noita-go/model"
 	"noita-go/model/gas"
 	"noita-go/model/liquid"
@@ -77,6 +76,8 @@ func (s *Scene) PaintElement(cType CellType) model.Element {
 		return solid.NewGround()
 	case 4:
 		return gas.NewSteam()
+	case 5:
+		return solid.NewFire()
 	default:
 		return solid.NewSand()
 	}
@@ -107,45 +108,13 @@ func (s *Scene) PaintSloped(mx, my int, cType CellType) {
 	if mx < 0 || mx > width || my < 0 || my > height {
 		return
 	}
-	dx := float64(mx - s.prevX)
-	dy := float64(my - s.prevY)
-	absDx := math.Abs(dx)
-	absDy := math.Abs(dy)
-	if dx == 0 || dy == 0 {
-		return
-	}
-	xDiffIsLarger := absDx > absDy
-	stepX := 1.0
-	if dx < 0 {
-		stepX = -1.0
-	}
-	stepY := 1.0
-	if dy < 0 {
-		stepY = -1.0
-	}
-	longerSideLength := math.Max(absDx, absDy)
-	shorterSideLength := math.Min(absDx, absDy)
-	slope := shorterSideLength / longerSideLength
-
-	for i := 1.0; i <= longerSideLength; i++ {
-		shorterSideIncrease := math.Round(i * slope)
-		xIncrease := 0.0
-		yIncrease := 0.0
-		if xDiffIsLarger {
-			xIncrease = i
-			yIncrease = shorterSideIncrease
-		} else {
-			xIncrease = shorterSideIncrease
-			yIncrease = i
-		}
-		toX := s.prevX + int(math.Round(xIncrease*stepX))
-		toY := s.prevY + int(math.Round(yIncrease*stepY))
-		s.PaintAt(toX, toY, cType)
-	}
-
+	prevPt := utils.Pt(float64(s.prevX), float64(s.prevY))
+	mPt := utils.Pt(float64(mx), float64(my))
+	prevPt.SlopeAction(mPt, func(x, y float64) {
+		s.PaintAt(int(x), int(y), cType)
+	})
 	s.prevX = mx
 	s.prevY = my
-
 }
 
 func (s *Scene) Painting(cType CellType) {
@@ -167,7 +136,7 @@ func (s *Scene) Update() error {
 		s.Paused = !s.Paused
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		s.PaintType = (s.PaintType + 1) % 5
+		s.PaintType = (s.PaintType + 1) % 6
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		s.prevX, s.prevY = ebiten.CursorPosition()
@@ -200,6 +169,10 @@ func (s *Scene) BrushLabel() string {
 		return "Water"
 	case 3:
 		return "Ground"
+	case 4:
+		return "Steam"
+	case 5:
+		return "Fire"
 	default:
 		return "-"
 	}

@@ -31,11 +31,20 @@ func (g *Gas) Update(cell *model.Cell) {
 		return
 	}
 	g.LifeSpan -= 1
-	if g.LookUp(cell) {
-		return
-	}
-	if g.LookDiagonally(cell) {
-		return
+	if rand.Float64() < 0.8 {
+		if g.LookUp(cell) {
+			return
+		}
+		if g.LookDiagonally(cell) {
+			return
+		}
+	} else {
+		if g.LookDiagonally(cell) {
+			return
+		}
+		if g.LookUp(cell) {
+			return
+		}
 	}
 	g.LookSideways(cell)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	scale   = 2
+	scale   = 4
 	width   = 640
 	height  = 480
 	wScaled = width / scale

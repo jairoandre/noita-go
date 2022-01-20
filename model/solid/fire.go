@@ -1,6 +1,7 @@
 package solid
 
 import (
+	"github.com/mazznoer/colorgrad"
 	"image/color"
 	"math/rand"
 	"noita-go/model"
@@ -12,6 +13,8 @@ type Fire struct {
 	Solid
 }
 
+var fireGradient = colorgrad.YlOrRd()
+
 const maxLifespan = 300.0
 
 func NewFire() *Fire {
@@ -22,7 +25,7 @@ func NewFire() *Fire {
 
 func (f *Fire) Update(cell *model.Cell) {
 	if f.LifeSpan <= 0 {
-		cell.Element = gas.NewSteam()
+		cell.Element = gas.NewFlame()
 		return
 	}
 	f.Solid.Update(cell)
@@ -30,18 +33,10 @@ func (f *Fire) Update(cell *model.Cell) {
 }
 
 func (f *Fire) Alpha() color.Alpha {
-	alpha := uint8(255.0 * f.LifeSpan / maxLifespan)
-	return color.Alpha{A: alpha}
+	return color.Alpha{A: 0xff}
 }
 
 func (f *Fire) Color() color.Color {
-	rng := rand.Float64()
-	if rng < 0.33 {
-		return color.White
-	} else if rng < 0.66 {
-		return color.RGBA{R: 0xff, G: 0xff, A: 0xff}
-
-	} else {
-		return color.RGBA{R: 0xff, A: 0xff}
-	}
+	rng := 0.5 - rand.Float64()*0.2
+	return fireGradient.At(rng)
 }

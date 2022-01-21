@@ -7,7 +7,7 @@ import (
 
 type Gas struct {
 	DispersionRate int
-	LifeSpan       int
+	LifeSpan       float64
 }
 
 func (g *Gas) Weight() int {

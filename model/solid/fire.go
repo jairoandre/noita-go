@@ -9,24 +9,28 @@ import (
 )
 
 type Fire struct {
-	LifeSpan float64
+	MaxLifeSpan float64
+	LifeSpan    float64
 	Solid
 }
 
 var fireGradient = colorgrad.YlOrRd()
 
-const maxLifespan = 300.0
+const maxFireLifeSpan = 300.0
 
 func NewFire() *Fire {
 	fire := Fire{}
-	fire.LifeSpan = maxLifespan * (0.85 + rand.Float64()*0.15)
+	fire.MaxLifeSpan = maxFireLifeSpan
+	fire.LifeSpan = maxFireLifeSpan * (0.85 + rand.Float64()*0.15)
 	return &fire
 }
 
 func (f *Fire) Update(cell *model.Cell) {
 	if f.LifeSpan <= 0 {
-		cell.Element = gas.NewFlame()
-		return
+		cell.Element = model.NewEmpty()
+	}
+	if cell.Up != nil && cell.Up.Element.Type() == model.EmptyType && rand.Float64() < 0.05 {
+		cell.Up.Element = gas.NewFlame()
 	}
 	f.Solid.Update(cell)
 	f.LifeSpan -= 1

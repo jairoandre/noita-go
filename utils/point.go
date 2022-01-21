@@ -9,14 +9,13 @@ type Point struct {
 	YInt int
 }
 
-type Vector2D Point
+type Vector2D struct {
+	Point
+}
 
 func Vec2(x, y float64) Vector2D {
 	return Vector2D{
-		X:    x,
-		Y:    y,
-		XInt: int(x),
-		YInt: int(y),
+		Point: Pt(x, y),
 	}
 }
 

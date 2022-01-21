@@ -4,9 +4,11 @@ import (
 	"image/color"
 	"math/rand"
 	"noita-go/model"
+	"noita-go/utils"
 )
 
 type Solid struct {
+	Vel            utils.Vector2D
 	DispersionRate int
 	Falling        bool
 }

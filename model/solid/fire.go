@@ -37,6 +37,6 @@ func (f *Fire) Alpha() color.Alpha {
 }
 
 func (f *Fire) Color() color.Color {
-	rng := 0.5 - rand.Float64()*0.2
+	rng := rand.Float64() * 0.2
 	return fireGradient.At(rng)
 }

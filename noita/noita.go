@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	scale   = 4
-	width   = 640
-	height  = 480
+	scale   = 1
+	width   = 320
+	height  = 240
 	wScaled = width / scale
 	hScaled = height / scale
 )

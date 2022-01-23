@@ -27,7 +27,7 @@ func NewFire() *Fire {
 
 func (f *Fire) Update(cell *model.Cell) {
 	if f.LifeSpan <= 0 {
-		cell.Element = model.NewEmpty()
+		cell.Element = gas.NewSmoke()
 	}
 	if cell.Up != nil && cell.Up.Element.Type() == model.EmptyType && rand.Float64() < 0.05 {
 		cell.Up.Element = gas.NewFlame()

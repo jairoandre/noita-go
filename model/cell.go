@@ -6,26 +6,32 @@ import (
 	"noita-go/utils"
 )
 
+var (
+	gravityForce = utils.Vec2dXY(0, 9.8)
+)
+
 type Cell struct {
-	Tick      int
-	Pos       utils.Point
-	Scale     float64
-	xScaled   float64
-	yScaled   float64
-	iXScaled  int
-	iYScaled  int
-	Element   Element
-	Grid      *Grid
-	Down      *Cell
-	Up        *Cell
-	Left      *Cell
-	Right     *Cell
-	LeftUp    *Cell
-	LeftDown  *Cell
-	RightUp   *Cell
-	RightDown *Cell
-	Glowing   bool
-	Rect      image.Rectangle
+	Tick                 int
+	Pos                  utils.Point
+	Scale                float64
+	xScaled              float64
+	yScaled              float64
+	iXScaled             int
+	iYScaled             int
+	Element              Element
+	Grid                 *Grid
+	Down                 *Cell
+	Up                   *Cell
+	Left                 *Cell
+	Right                *Cell
+	LeftUp               *Cell
+	LeftDown             *Cell
+	RightUp              *Cell
+	RightDown            *Cell
+	Glowing              bool
+	Rect                 image.Rectangle
+	Particle             Particle
+	InParticleSimulation bool
 }
 
 func NewCell(x, y, scale float64, grid *Grid) *Cell {

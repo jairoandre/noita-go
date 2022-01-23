@@ -13,6 +13,10 @@ type Vector2D struct {
 	Point
 }
 
+func (vec2 Vector2D) ToPt() Point {
+	return vec2.Point
+}
+
 func Vec2(x, y float64) Vector2D {
 	return Vector2D{
 		Point: Pt(x, y),
